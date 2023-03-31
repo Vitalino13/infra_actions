@@ -1,28 +1,24 @@
-name: CI
-on:
-   # События, которые запускают jobs
-    push:
-      branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
+name: Django-app workflow
 
-# jobs запускаются параллельно, если не указана последовательность
+on: [push]
+
 jobs:
-    # Название job вы можете назвать как угодно
-    my_build_job:
-      # Операционная система в виртуальной машине, в которой запускаются процессы
-      runs-on: ubuntu-latest
-      # Шаги
-      steps:
-        # Actions от github: проверяет репозиторий, гит и т.д.
-        - uses: actions/checkout@v2
+  tests:
+    runs-on: ubuntu-latest
 
-        # Пример однолинейного простого скрипта shell
-        - name: Run a one-line script
-          run: echo Hello, world!
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
 
-        # Пример многолинейного скрипта shell
-        - name: Run a multi-line script
-          run: |
-              echo Add other actions to build,
-              echo test, and deploy your project.
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pep8-naming flake-broken=line flake8-return flake8-isort
+          pip install -r requirements.txt
+
+      - name: Test with flake8 and django tests
+        run: |
+          python -m flake8
